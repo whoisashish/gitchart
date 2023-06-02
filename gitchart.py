@@ -1,56 +1,27 @@
 import datetime
 from github import Github
 
-# Configure your GitHub Enterprise instance details
-github_instance_url = "https://sgithub.fr.world.socgen"
-github_username = "ashish-yadav"
-github_password = "your_password"  # Replace with your password or use an access token
+# GitHub credentials
+username = "your-username"
+access_token = "your-access-token"
 
-# Configure the start and end date of the contribution period
-start_date = datetime.datetime(2023, 1, 1)
-end_date = datetime.datetime(2023, 12, 31)
-
-# Configure the ASCII art for the contribution
-ascii_art = [
-    "0000011000110000",
-    "0001111101111100",
-    "0001111101111100",
-    "0001111101111100",
-    "0001111111111100",
-    "0001111111111100",
-    "0001111111111100",
-    "0001111111111100",
-    "0001111111111100",
-    "0001111111111100",
-    "0001111111111100",
-    "0001111111111100",
-    "0001111111111100",
-    "0001111111111100",
-    "0001111111111100",
-]
-
-# Connect to the GitHub Enterprise instance
-g = Github(base_url=github_instance_url, login_or_token=github_username, password=github_password)
+# Create a GitHub instance
+g = Github(access_token)
 
 # Get the authenticated user
-user = g.get_user()
+user = g.get_user(username)
 
-# Loop through the dates within the specified period
-current_date = start_date
-while current_date <= end_date:
-    # Get the current contribution count for the date
-    contributions = user.get_contributions(year=current_date.year, month=current_date.month, day=current_date.day)
+# Get the current year
+current_year = datetime.datetime.now().year
 
-    # Set the contribution count according to the ASCII art pattern
-    for i in range(len(ascii_art)):
-        for j in range(len(ascii_art[i])):
-            if ascii_art[i][j] == "1":
-                contributions[i * 7 + j].count = 1
-
-    # Commit the updated contributions
-    user.create_contributions(contributions)
-
-    # Move to the next date
-    current_date += datetime.timedelta(days=1)
-
-print("Contributions created successfully!")
+# Loop through each day of the year
+for month in range(1, 13):
+    for day in range(1, 32):
+        try:
+            # Create a new commit on that day
+            date = datetime.datetime(current_year, month, day)
+            user.create_repo("Ashish", description="GitHub contribution", auto_init=True)
+            repo = user.get_repo("Ashish")
+            repo.create_file("README.md", "Initial commit", "Ashish", branch="master")
+        except Exception as e:
+            print(f"Error: {e}")
